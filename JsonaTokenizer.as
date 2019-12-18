@@ -14,9 +14,9 @@ enum JsonaTokenType{
 }
 
 class JsonaToken{
-  private int tokenType;
+  private JsonaTokenType tokenType;
   private string value;
-  JsonaToken(int tokenType = NULL, string value = ""){
+  JsonaToken(JsonaTokenType tokenType = NULL, string value = ""){
     this.tokenType = tokenType;
     this.value = value;
   }
