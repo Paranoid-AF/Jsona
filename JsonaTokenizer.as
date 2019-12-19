@@ -250,13 +250,30 @@ class JsonaTokenizer{
     if(next == "u"){
       storageStr = "\\u";
       while(true){
-        storageStr += getNextChar();
+        getNextChar();
         if(pos < dataStr.Length() - 1){
+          bool shouldEnd = false;
+          for(uint i=0; i<endingCharStandard.length(); i++){
+            if(endingCharStandard[i] == buffer){
+              shouldEnd = true;
+            }
+          }
+          for(uint i=0; i<endingCharNonStandard.length(); i++){
+            if(endingCharNonStandard[i] == buffer){
+              shouldEnd = true;
+            }
+          }
+          if(shouldEnd){ // 如果发现存在末尾标志
+            pos--; // 交由 getString 处理
+            return storageStr;
+          }
+          storageStr += buffer;
           if(storageStr.Length() >= 6){
             // BUG: storageStr here is already an escape character, but cannot be converted to a unicode character. This is due to the limitation of AngelScript.
             return storageStr;
           }
         }else{
+          storageStr += buffer;
           return storageStr;
         }
       }
