@@ -121,6 +121,7 @@ class JsonaValue{
   }
   
   void set(dictionary value){
+    dangerouslyResetValue();
     this.contentType = OBJECT_VALUE;
     @this.valueObject = @value; // 注意: 这里使用引用以避免重复深拷贝，同时还可以使数据双向流动
   }
