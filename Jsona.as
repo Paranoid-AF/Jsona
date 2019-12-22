@@ -72,7 +72,8 @@ class Jsona{
       if(tokens[pos].getType() == SEP_COLON){
         if(pos-1 >= 0 && pos+1 < int(tokens.length()) && tokens[pos-1].getType() == STRING && isElement(tokens[pos+1].getType())){ // has key
           pos++;
-          result.set(tokens[pos-1].getValue(), process());
+          string key = tokens[pos-2].getValue();
+          result.set(key, process());
         }else{
           g_Game.AlertMessage(at_console, "[ERROR::JsonaMain] Invalid key-value in an object.\n");
         }
