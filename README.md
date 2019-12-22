@@ -1,11 +1,11 @@
-# Jsona
-A JSON parser for AngelScript in Sven Co-op.
+# JSONa
+Jsona, stylised as JSONa, is a JSON parser for AngelScript in Sven Co-op.
 
 ### What is this?
 This is a library for other AngelScript plugins in Sven Co-op. In other words, this is NOT a plugin itself, so you don't really install it. It's actually USED by plugins.
 
 ### What is this for?
-Jsona could parse a JSON string into objects that AngelScript recognizes, and you're able to modify them, then stringify them back into a JSON string.
+JSONa could parse a JSON string into objects that AngelScript recognizes, and you're able to modify them, then stringify them back into a JSON string.
 Sounds simple, right? That is the way it should be, and glad it is. 
 
 ### How does this work?
