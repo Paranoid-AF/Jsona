@@ -101,4 +101,54 @@ class Jsona{
     }
     return JsonaValue(result);
   }
+
+  string stringify(JsonaValue@ head){
+    string result = "";
+    if(head.type() == OBJECT_VALUE){
+      result += "{";
+      dictionary val = head.getObject();
+      array<string> keys = val.getKeys();
+      for(uint i=0; i<keys.length(); i++){
+        result += "\"" + keys[i] + "\"";
+        result += ":";
+        JsonaValue@ temp = cast<JsonaValue@>(val[keys[i]]);
+        result += stringify(temp);
+        if(i != keys.length() - 1){
+          result += ",";
+        }
+      }
+      result += "}";
+    }
+    if(head.type() == ARRAY_VALUE){
+      result += "[";
+      array<JsonaValue@> val = head.getArray();
+      for(uint i=0; i<val.length(); i++){
+        result += stringify(val[i]);
+        if(i != val.length() - 1){
+          result += ",";
+        }
+      }
+      result += "]";
+    }
+    if(head.type() == BOOLEAN_VALUE){
+      if(head.getBool()){
+        result += "true";
+      }else{
+        result += "false";
+      }
+    }
+    if(head.type() == STRING_VALUE){
+      result += "\"" + head.getString() + "\"";
+    }
+    if(head.type() == INT_VALUE){
+      result += string(head.getInt());
+    }
+    if(head.type() == REAL_VALUE){
+      result += string(head.getReal());
+    }
+    if(head.type() == NULL_VALUE){
+      result += "null";
+    }
+    return result;
+  }
 }
