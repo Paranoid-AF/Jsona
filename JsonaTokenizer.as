@@ -21,7 +21,7 @@ class JsonaToken{
     this.value = value;
   }
   
-  int getType(){
+  JsonaTokenType getType(){
     return tokenType;
   }
   
@@ -60,6 +60,8 @@ class JsonaTokenizer{
   private void tokenize(){
     JsonaToken@ currentToken;
     tokens.resize(0);
+    pos = 0;
+    line = 0;
     do{
       @currentToken = process();
       tokens.insertLast(@currentToken);
