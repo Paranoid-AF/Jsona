@@ -45,15 +45,15 @@ class JsonaTokenizer{
     this.shouldConvertEscape = shouldConvertEscape;
   }
   
-  array<JsonaToken@> Parse(string str){
+  array<JsonaToken@> parse(string str){
     dataStr = str;
     tokenize();
     return tokens;
   }
   
-  array<JsonaToken@> Parse(string str, bool shouldConvertEscape){
+  array<JsonaToken@> parse(string str, bool shouldConvertEscape){
     this.shouldConvertEscape = shouldConvertEscape;
-    Parse(str);
+    parse(str);
     return tokens;
   }
   
@@ -65,7 +65,7 @@ class JsonaTokenizer{
       tokens.insertLast(@currentToken);
     }while(currentToken.getType() != END_DOCUMENT && currentToken.getType() != ERROR);
     if(currentToken.getType() == ERROR){
-      g_Game.AlertMessage(at_console, "[ERROR] An error occurred while trying to tokenize JSON string "+currentToken.getValue()+"\n");
+      g_Game.AlertMessage(at_console, "[ERROR::JsonaTokenizer] An error occurred while trying to tokenize JSON string "+currentToken.getValue()+"\n");
     }
   }
   
