@@ -145,7 +145,7 @@ class JsonaValue{
 
 
   // 代为访问 array
-  JsonaValue@ get_helper_arr(int idx){
+  private JsonaValue@ get_helper_arr(int idx){
     if(idx >= int(valueArray.length()) || idx < 0){
       g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the array value for out of bound.\n");
       return null;
@@ -155,7 +155,7 @@ class JsonaValue{
   }
 
   // 代为写入 array
-  void set_helper_arr(int idx, JsonaValue@ value){
+  private void set_helper_arr(int idx, JsonaValue@ value){
     if(idx >= int(valueArray.length()) || idx < 0){
       g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify the array value for out of bound.\n");
     }else{
