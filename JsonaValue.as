@@ -126,38 +126,40 @@ class JsonaValue{
     @this.valueObject = @value; // 注意: 这里使用引用以避免重复深拷贝，同时还可以使数据双向流动
   }
 
+
+  private bool isNumber(string str){
+    bool val = true;
+    for(uint i=0; i<str.Length(); i++){
+      if(!isdigit(str.SubString(i, 1))){
+        val = false;
+        break;
+      }
+    }
+    return val;
+  }
+
   /*
     好耶，是语法糖！
     为了便于嵌套访问数据（比如 arr[0]["key"][0]["key1"]），JsonaValue 会为程序代为访问 array 和 dictionary，并返回相应的 JsonaValue。
   */
 
+
   // 代为访问 array
-  JsonaValue@ get_opIndex(int idx){
-    if(this.contentType != ARRAY_VALUE){
-      // 弟啊，你这都不是数组啊
-      g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access a non-array value as an array value.\n");
+  JsonaValue@ get_helper_arr(int idx){
+    if(idx >= int(valueArray.length()) || idx < 0){
+      g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the array value for out of bound.\n");
       return null;
     }else{
-      if(idx >= int(valueArray.length()) || idx < 0){
-        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the array value for out of bound.\n");
-        return null;
-      }else{
-        return valueArray[idx];
-      }
+      return valueArray[idx];
     }
   }
 
   // 代为写入 array
-  void set_opIndex(int idx, JsonaValue@ value){
-    if(this.contentType != ARRAY_VALUE){
-      // 弟啊，你这都不是数组啊
-      g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify a non-array value as an array value.\n");
+  void set_helper_arr(int idx, JsonaValue@ value){
+    if(idx >= int(valueArray.length()) || idx < 0){
+      g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify the array value for out of bound.\n");
     }else{
-      if(idx >= int(valueArray.length()) || idx < 0){
-        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify the array value for out of bound.\n");
-      }else{
-        valueArray[idx] = value;
-      }
+      valueArray[idx] = value;
     }
   }
 
@@ -165,7 +167,16 @@ class JsonaValue{
   JsonaValue@ get_opIndex(string idx){
     if(this.contentType != OBJECT_VALUE){
       // 弟啊，你这都不是对象啊
-      g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access a non-dictionary value as a dictionary value.\n");
+      if(this.contentType == ARRAY_VALUE){
+        if(isNumber(idx)){
+          int idx_num = atoi(idx);
+          return get_helper_arr(idx_num);
+        }else{
+          g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access an array value with a non-integer key.\n");
+        }
+      }else{
+        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Operator overloads must work with an array or a dictionary.\n");
+      }
       return null;
     }else{
       if(!valueObject.exists(idx)){
@@ -181,7 +192,16 @@ class JsonaValue{
   void set_opIndex(string idx, JsonaValue@ value){
     if(this.contentType != OBJECT_VALUE){
       // 弟啊，你这都不是对象啊
-      g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access a non-dictionary value as a dictionary value.\n");
+      if(this.contentType == ARRAY_VALUE){
+        if(isNumber(idx)){
+          int idx_num = atoi(idx);
+          set_helper_arr(idx_num, value);
+        }else{
+          g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify an array value with a non-integer key.\n");
+        }
+      }else{
+        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Operator overloads must work with an array or a dictionary.\n");
+      }
     }else{
       valueObject[idx] = value;
     }
