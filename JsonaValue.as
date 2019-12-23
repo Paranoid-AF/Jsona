@@ -138,7 +138,12 @@ class JsonaValue{
       g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access a non-array value as an array value.\n");
       return null;
     }else{
-      return valueArray[idx];
+      if(idx >= int(valueArray.length()) || idx < 0){
+        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the array value for out of bound.\n");
+        return null;
+      }else{
+        return valueArray[idx];
+      }
     }
   }
 
@@ -148,7 +153,11 @@ class JsonaValue{
       // 弟啊，你这都不是数组啊
       g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify a non-array value as an array value.\n");
     }else{
-      valueArray[idx] = value;
+      if(idx >= int(valueArray.length()) || idx < 0){
+        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot modify the array value for out of bound.\n");
+      }else{
+        valueArray[idx] = value;
+      }
     }
   }
 
@@ -159,7 +168,12 @@ class JsonaValue{
       g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access a non-dictionary value as a dictionary value.\n");
       return null;
     }else{
-      return cast<JsonaValue@>(valueObject[idx]);
+      if(!valueObject.exists(idx)){
+        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the target value for invalid key.\n");
+        return null;
+      }else{
+        return cast<JsonaValue@>(valueObject[idx]);
+      }
     }
   }
 
