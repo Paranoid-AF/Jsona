@@ -61,73 +61,56 @@ class JsonaValue{
     return this.contentType;
   }
 
-  bool getBool(){
-    return this.valueBoolean;
-  }
+  bool opConv() { return this.valueBoolean; } 
+  string opConv() { return this.valueString; }
+  int opConv() { return this.valueInt; }
+  double opConv() { return this.valueReal; }
+  array<JsonaValue@>@ opConv() { return @this.valueArray; }
+  dictionary@ opConv(){ return @this.valueObject; }
 
-  string getString(){
-    return this.valueString;
-  }
-
-  int getInt(){
-    return this.valueInt;
-  }
-
-  double getReal(){
-    return this.valueReal;
-  }
-
-  array<JsonaValue@>@ getArray(){
-    return @this.valueArray;
-  }
-
-  dictionary@ getObject(){
-    return @this.valueObject;
-  }
-
-  void set(){
+  void set() {
     dangerouslyResetValue();
     this.contentType = NULL_VALUE;
   }
 
-  void set(bool value){
+  void set(bool value) {
     dangerouslyResetValue();
     this.contentType = BOOLEAN_VALUE;
     this.valueBoolean = value;
   }
 
-  void set(string value){
+  void set(string value) {
     dangerouslyResetValue();
     this.contentType = STRING_VALUE;
     this.valueString = value;
   }
 
-  void set(int value){
+  void set(int value) {
     dangerouslyResetValue();
     this.contentType = INT_VALUE;
     this.valueInt = value;
   }
 
-  void set(double value){
+  void set(double value) {
     dangerouslyResetValue();
     this.contentType = REAL_VALUE;
     this.valueReal = value;
   }
 
-  void set(array<JsonaValue@> value){
+  void set(array<JsonaValue@> value) {
     dangerouslyResetValue();
     this.contentType = ARRAY_VALUE;
     @this.valueArray = @value; // 注意: 这里使用引用以避免重复深拷贝，同时还可以使数据双向流动
   }
   
-  void set(dictionary value){
+  void set(dictionary value) {
     dangerouslyResetValue();
     this.contentType = OBJECT_VALUE;
     @this.valueObject = @value; // 注意: 这里使用引用以避免重复深拷贝，同时还可以使数据双向流动
   }
 
 
-  private bool isNumber(string str){
+  private bool isNumber(string str) {
     bool val = true;
     for(uint i=0; i<str.Length(); i++){
       if(!isdigit(str.SubString(i, 1))){
@@ -178,14 +161,13 @@ class JsonaValue{
         g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Operator overloads must work with an array or a dictionary.\n");
       }
       return null;
-    }else{
-      if(!valueObject.exists(idx)){
-        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the target value for invalid key.\n");
-        return null;
-      }else{
-        return cast<JsonaValue@>(valueObject[idx]);
-      }
     }
+
+    if (!valueObject.exists(idx)) {
+      valueObject[idx] = JsonaValue(dictionary = {});
+    }
+
+    return cast<JsonaValue@>(valueObject[idx]);
   }
 
   // 代为写入 dictionary

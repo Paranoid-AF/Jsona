@@ -106,9 +106,9 @@ class Jsona{
     string result = "";
     if(head.type() == OBJECT_VALUE){
       result += "{";
-      dictionary val = head.getObject();
+      dictionary val = dictionary(head);
       array<string> keys = val.getKeys();
-      for(uint i=0; i<keys.length(); i++){
+      for (uint i=0; i < keys.length(); i++){
         result += "\"" + keys[i] + "\"";
         result += ":";
         JsonaValue@ temp = cast<JsonaValue@>(val[keys[i]]);
@@ -121,7 +121,7 @@ class Jsona{
     }
     if(head.type() == ARRAY_VALUE){
       result += "[";
-      array<JsonaValue@> val = head.getArray();
+      array<JsonaValue@> val = array<JsonaValue@>(head);
       for(uint i=0; i<val.length(); i++){
         result += stringify(val[i]);
         if(i != val.length() - 1){
@@ -130,21 +130,17 @@ class Jsona{
       }
       result += "]";
     }
-    if(head.type() == BOOLEAN_VALUE){
-      if(head.getBool()){
-        result += "true";
-      }else{
-        result += "false";
-      }
+    if(head.type() == BOOLEAN_VALUE) {
+      result += bool(head) ? "true" : "false";
     }
     if(head.type() == STRING_VALUE){
-      result += "\"" + head.getString() + "\"";
+      result += "\"" + string(head) + "\"";
     }
     if(head.type() == INT_VALUE){
-      result += string(head.getInt());
+      result += string(int(head));
     }
     if(head.type() == REAL_VALUE){
-      result += string(head.getReal());
+      result += string(double(head));
     }
     if(head.type() == NULL_VALUE){
       result += "null";
