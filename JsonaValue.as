@@ -201,5 +201,9 @@ namespace Jsona {
         valueObject[idx] = value;
       }
     }
+
+    string stringify() {
+      return Jsona::stringify(this);
+    }
   }
 }
