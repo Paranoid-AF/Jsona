@@ -174,7 +174,8 @@ namespace Jsona {
       }
 
       if (!valueObject.exists(idx)) {
-        valueObject[idx] = Value(dictionary = {});
+        g_Game.AlertMessage(at_console, "[ERROR::JsonaValue] Cannot access the target value for invalid key.\n");
+        return null;
       }
 
       return cast < Value @ > (valueObject[idx]);
