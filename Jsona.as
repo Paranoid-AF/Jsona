@@ -1,154 +1,161 @@
 #include "JsonaValue"
 #include "JsonaTokenizer"
-class Jsona{
-  private int pos = 0;
-  private array<JsonaToken@> tokens;
-  private JsonaTokenizer tokenizer;
 
-  JsonaValue@ parse(string str){
-    tokens.resize(0);
+namespace Jsona {
+  int pos = 0;
+  array < Token @ > tokens;
+  Tokenizer tokenizer;
+
+  Value @ parse(string str) {
     pos = 0;
+    tokens.resize(0);
+
     tokens = tokenizer.parse(str);
-    JsonaValue@ head = process();
+    Value @ head = process();
     return head;
   }
 
-  private JsonaValue@ process(){
-    if(tokens.length() < 1){
+  Value@ process() {
+    if (tokens.length() < 1) {
       g_Game.AlertMessage(at_console, "[ERROR::JsonaMain] No token found in the target string!\n");
-    }else{
-      if(tokens[pos].getType() == BEGIN_OBJECT){
-        return processObject();
-      }else if(tokens[pos].getType() == BEGIN_ARRAY){
-        return processArray();
-      }else if(tokens[pos].getType() == NULL){
-        return processNull();
-      }else if(tokens[pos].getType() == NUMBER){
-        return processNumber();
-      }else if(tokens[pos].getType() == STRING){
-        return processString();
-      }else if(tokens[pos].getType() == BOOLEAN){
-        return processBoolean();
-      }
+      return Value();
+    } 
+
+    switch (tokens[pos].getType()) {
+      case BEGIN_OBJECT: return processObject();
+      case BEGIN_ARRAY: return processArray();
+      case NULL: return processNull();
+      case NUMBER: return processNumber();
+      case STRING: return processString();
+      case BOOLEAN: return processBoolean();
     }
-    return JsonaValue();
+
+    return Value();
   }
 
-  private bool isElement(JsonaTokenType type){
+  bool isElement(TokenType type) {
     return (type == BEGIN_OBJECT || type == BEGIN_ARRAY || type == NULL || type == NUMBER || type == STRING || type == BOOLEAN);
   }
 
-  private JsonaValue@ processBoolean(){
+  Value @ processBoolean() {
     string val = tokens[pos].getValue();
     bool targetValue = atobool(val);
-    return JsonaValue(targetValue);
+    return Value(targetValue);
   }
 
-  private JsonaValue@ processNumber(){
+  Value @ processNumber() {
     string val = tokens[pos].getValue();
-    if(val.Find(".") == String::INVALID_INDEX){ // Check int or real
+    if (val.Find(".") == String::INVALID_INDEX) { // Check int or real
       // int
       int targetValue = atoi(val);
-      return JsonaValue(targetValue);
-    }else{
+      return Value(targetValue);
+    } else {
       // real
       double targetValue = atod(val);
-      return JsonaValue(targetValue);
+      return Value(targetValue);
     }
   }
 
-  private JsonaValue@ processNull(){
-    return JsonaValue();
+  Value @ processNull() {
+    return Value();
   }
 
-  private JsonaValue@ processString(){
+  Value @ processString() {
     string val = tokens[pos].getValue();
-    return JsonaValue(val);
+    return Value(val);
   }
 
-  private JsonaValue@ processObject(){
+  Value @ processObject() {
     dictionary result;
-    while(pos < int(tokens.length()) && tokens[pos].getType() != END_OBJECT){
-      if(tokens[pos].getType() == SEP_COLON){
-        if(pos-1 >= 0 && pos+1 < int(tokens.length()) && tokens[pos-1].getType() == STRING && isElement(tokens[pos+1].getType())){ // has key
+    while (pos < int(tokens.length()) && tokens[pos].getType() != END_OBJECT) {
+      if (tokens[pos].getType() == SEP_COLON) {
+
+        if (pos - 1 >= 0 && pos + 1 < int(tokens.length()) && tokens[pos - 1].getType() == STRING && isElement(tokens[pos + 1].getType())) { // has key
           pos++;
-          string key = tokens[pos-2].getValue();
+          string key = tokens[pos - 2].getValue();
           result.set(key, process());
-        }else{
+        } else {
           g_Game.AlertMessage(at_console, "[ERROR::JsonaMain] Invalid key-value in an object.\n");
         }
       }
       pos++;
     }
-    return JsonaValue(result);
+    return Value(result);
   }
 
-  private JsonaValue@ processArray(){
-    array<JsonaValue@> result;
+  Value @ processArray() {
+    array < Value @ > result;
     pos++;
-    while(pos < int(tokens.length()) && tokens[pos].getType() != END_ARRAY){
-      if(tokens[pos].getType() == SEP_COMMA){
+    while (pos < int(tokens.length()) && tokens[pos].getType() != END_ARRAY) {
+      if (tokens[pos].getType() == SEP_COMMA) {
         pos++;
         continue;
       }
-      if(isElement(tokens[pos].getType())){
+      if (isElement(tokens[pos].getType())) {
         result.insertLast(process());
-      }else{
+      } else {
         g_Game.AlertMessage(at_console, "[ERROR::JsonaMain] Invalid value in an array.\n");
       }
-      
+
       pos++;
     }
-    return JsonaValue(result);
+    return Value(result);
   }
 
-  string stringify(JsonaValue@ head){
+  string stringify(Value @ head) {
     string result = "";
-    if(head.type() == OBJECT_VALUE){
-      result += "{";
-      dictionary val = head.getObject();
-      array<string> keys = val.getKeys();
-      for(uint i=0; i<keys.length(); i++){
-        result += "\"" + keys[i] + "\"";
-        result += ":";
-        JsonaValue@ temp = cast<JsonaValue@>(val[keys[i]]);
-        result += stringify(temp);
-        if(i != keys.length() - 1){
-          result += ",";
+
+    switch (head.type()) {
+      case OBJECT_VALUE: {
+        result += "{";
+        dictionary val = dictionary(head);
+        array < string > keys = val.getKeys();
+        for (uint i = 0; i < keys.length(); i++) {
+          result += "\"" + keys[i] + "\"";
+          result += ":";
+          Value @ temp = cast < Value @ > (val[keys[i]]);
+          result += stringify(temp);
+          if (i != keys.length() - 1) {
+            result += ",";
+          }
         }
+        result += "}";
+        break;
       }
-      result += "}";
-    }
-    if(head.type() == ARRAY_VALUE){
-      result += "[";
-      array<JsonaValue@> val = head.getArray();
-      for(uint i=0; i<val.length(); i++){
-        result += stringify(val[i]);
-        if(i != val.length() - 1){
-          result += ",";
-        }
+      case ARRAY_VALUE: {
+          result += "[";
+          array < Value @ > val = array < Value @ > (head);
+          for (uint i = 0; i < val.length(); i++) {
+            result += stringify(val[i]);
+            if (i != val.length() - 1) {
+              result += ",";
+            }
+          }
+          result += "]";
+          break;
       }
-      result += "]";
-    }
-    if(head.type() == BOOLEAN_VALUE){
-      if(head.getBool()){
-        result += "true";
-      }else{
-        result += "false";
+      case BOOLEAN_VALUE: {
+        result += bool(head) ? "true" : "false";
+        break;
+      }
+      case STRING_VALUE: {
+        result += "\"" + string(head) + "\"";
+        break;
+      }
+      case INT_VALUE: {
+        result += string(int(head));
+        break;
+      }
+      case REAL_VALUE: {
+        result += string(double(head));
+        break;
+      }
+      case NULL_VALUE: {
+        result += "null";
+        break;
       }
     }
-    if(head.type() == STRING_VALUE){
-      result += "\"" + head.getString() + "\"";
-    }
-    if(head.type() == INT_VALUE){
-      result += string(head.getInt());
-    }
-    if(head.type() == REAL_VALUE){
-      result += string(head.getReal());
-    }
-    if(head.type() == NULL_VALUE){
-      result += "null";
-    }
+    
     return result;
   }
 }
