@@ -150,7 +150,6 @@ namespace Jsona {
       }
     }
 
-    // 代为写入 array
     private void set_helper_arr(int idx, Value @ value) {
       if (idx >= int(valueArray.length()) || idx < 0) {
         g_Game.AlertMessage(at_console, "[ERROR::Value] Cannot modify the array value for out of bound.\n");
@@ -159,10 +158,8 @@ namespace Jsona {
       }
     }
 
-    // 代为访问 dictionary
     Value @ get_opIndex(string idx) {
       if (this.contentType != OBJECT_VALUE) {
-        // 弟啊，你这都不是对象啊
         if (this.contentType == ARRAY_VALUE) {
           if (isNumber(idx)) {
             int idx_num = atoi(idx);
